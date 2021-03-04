@@ -1,88 +1,102 @@
--- Impl of drop
-{-
-mydrop n xs = if n <= 0 || null xs
-                 then xs
-            else mydrop (n - 1) (tail xs)
--}
 
--- Impl of take
-{-
-mytake n xs = if n <= 0 || null xs
-                 then []
-              else [head xs] ++ mytake (n-1) (tail xs)
-
-lastButOne xs = if null (tail (tail xs))
-                   then head xs
-                else lastButOne (tail xs)
--}
-
--- AckermanFunction
-{-
-ackF k y = if k == 0
-              then y + 1
-              else if y == 0 && k > 0
-              then ackF (k-1) 1
-            else ackF (k-1) (ackF k (y-1))
--}
-
-type CustomerID = Int
-type ReviewBody = String
-
-data BookInfo = Book Int String [String]
-                deriving (Show)
-
-data BookReview = BookReview BookInfo CustomerID ReviewBody
-                  deriving (Show)
-
-type BookRecord = (BookInfo, BookReview)
-
-type CardHolder = String
-type CardNumber = String
-type Address = [String]
-
-data BillingInfo = CreditCard CardNumber CardHolder Address
-                  | CashOnDelivery
-                  | Invoice CustomerID
-                    deriving (Show)
-
-myInfo = Book 9780135072455 "Algebra of Programming"
-         ["Richard Bird", "Oege de Moor"]
+import System.Environment (getArgs)
+import Data.List
+import Data.Char (digitToInt, toUpper, ord)
+import Data.Bits (shiftL, (.$.), (.|.))
 
 
-data Cartesian2D = Cartesian2D (Double, Double)
-                  deriving (Eq, Show)
-
-data Polar2D = Polar2D Double Double
-              deriving (Eq, Show)
-
-data Shape = Circle Cartesian2D Double
-            | Poly [Cartesian2D]
-            deriving (Show)
-
--- Pattern Matching
-add a 0 = a -- eq 1 for add
-add a b = a + b -- eq 2 for add
-
-sumList (x:xs) = x + sumList xs -- A list is of form (x0:(x1:(x2:[]))) in haskell
+interactWith function inputFile outputFile = do
+  input <- readFile inputFile
+  writeFile outputFile (function input)
 
 
+main = mainWith myFunction
+  where mainWith function = do
+          args <- getArgs
+          case args of
+            [input, output] -> interactWith function input output
+            _ -> putStrLn "error: exactly two arguments needed"
+        myFunction = id
 
 
+splitLines [] = []
+
+splitLines cs =
+  let (pre, suf) = break isLineTerminator cs
+   in pre : case suf of
+              ('\r':'\n':rest) -> splitLines rest
+              ('\r':rest) -> splitLines rest
+              ('\n':rest) -> splitLines rest
+              _ -> []
+
+isLineTerminator c = c == '\r' || c == '\n'
+
+-- Lists doesn't store it's length like in other imperative languages to length xs is always O(n)
+
+isEmptyList xs = if length xs > 0  -- O(n) complexity Bad impl
+                       then True
+                  else False
+
+-- Good Impl constant time
+isEmptyList2 xs = if not (null xs)
+                     then True
+                  else False
+
+isEmptyList3 (x:_) = True
+isEmptyList3 [] = False
+
+--------------------------
+
+safeHead :: [a] -> Maybe a
+
+safeHead (x:xs) = Just x
+safeHead [] = Nothing
+
+-------------------------
+
+asInt :: String -> Int
+loop :: Int -> String -> Int
+
+asInt xs = loop 0 xs
+
+loop acc [] = acc
+loop acc (x:xs) = let acc' = acc * 10 + digitToInt x    -- acc' is acc prime a way to write vars in haskell means that 
+                  in loop acc' xs                       -- acc' is somehow related to acc
+
+square :: [Double] -> [Double]
+
+square (x:xs) = x^2 : square xs
+square [] = []
+
+strUpper :: String -> String
+
+strUpper (x:xs) = toUpper x : strUpper xs
+strUpper [] = []
 
 
+--- Bad Impl as it's not tail recursive
+mySum (x:xs) = if null xs
+                  then x
+               else x + mySum xs
+mySum [] = 0
 
+---
 
+--- Tail recursive impl of mySum
+mySum2 xs = helper 0 xs
+  where helper acc (x:xs) = helper (acc + x) xs
+        helper acc _      = acc
+---
 
+--- Adler-32 CheckSum algorithm
 
+base = 65521
 
-
-
-
-
-
-
-
-
+adler32 xs = helper 1 0 xs
+  where helper a b (x:xs) = let a' = (a + (ord x .&. 0xff)) `mod` base
+                                b' = (a' + b) `mod` base
+                            in helper a' b; xs
+        helper a b _      = (b `shiftL` 16) .|. a
 
 
 

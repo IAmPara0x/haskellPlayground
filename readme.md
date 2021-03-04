@@ -1,4 +1,3 @@
 
-
 ## Learning Haskell
-####[following the book](actual URL to navigate)
+####[following the book](http://book.realworldhaskell.org/)
