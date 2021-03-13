@@ -2,9 +2,7 @@ module Prettify where
 
 import Prelude hiding ((<>))
 
-data Doc
-  = Empty
-  | Char Char
+data Doc = Empty | Char Char
   | Text String
   | Line
   | Concat Doc Doc
@@ -113,7 +111,7 @@ nest indSize x = indPrint indSize 0 [x]
       case d of
         Empty -> indPrint indSize indLvl ds
         Line -> case ds of 
-          (Char d':ds') -> if d' `notElem` closeParams
+          (Char d':_) -> if d' `notElem` closeParams
                              then '\n' : replicate (indLvl * indSize) ' ' ++ indPrint indSize indLvl ds
                            else '\n' : replicate ((indLvl - 1) * indSize) ' ' ++ indPrint indSize indLvl ds
           _ -> '\n' : replicate (indLvl * indSize) ' ' ++ indPrint indSize indLvl ds
