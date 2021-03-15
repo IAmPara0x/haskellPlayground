@@ -1,4 +1,5 @@
-
+play.hs
 *.hi
 *.o
-
+./jsonlib/simple
+./chap7

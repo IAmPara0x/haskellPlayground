@@ -104,7 +104,6 @@ w `fits` "" = True
 w `fits` ('\n' : _) = True
 w `fits` (c : cs) = (w - 1) `fits` cs
 
-nest :: Int -> Doc -> String
 nest indSize x = indPrint indSize 0 [x]
   where
     indPrint indSize indLvl (d : ds) =
